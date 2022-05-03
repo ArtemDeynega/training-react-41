@@ -46,10 +46,7 @@ export class App extends Component {
   };
   updateMaterial = async fields => {
     try {
-      const updatedMaterial = await API.updateMaterials({
-        id: 1,
-        title: 'Hop',
-      });
+      const updatedMaterial = await API.updateMaterials(fields);
       this.setState(({ materials }) => ({
         materials: materials.map(material =>
           material.id === fields.id ? updatedMaterial : material
@@ -64,14 +61,15 @@ export class App extends Component {
     const { isLoading, materials } = this.state;
     return (
       <>
-        <button type="button" onClick={this.updateMaterial}>
-          xxxx
-        </button>
         <MaterialEditorForm onSubmit={this.addMaterials} />
         {isLoading ? (
           <div>LOADING</div>
         ) : (
-          <Materials items={materials} onDelete={this.deleteMaterials} />
+          <Materials
+            items={materials}
+            onDelete={this.deleteMaterials}
+            onUpdate={this.updateMaterial}
+          />
         )}
         <GlobalStyles />
       </>
