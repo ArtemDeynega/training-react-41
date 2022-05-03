@@ -1,78 +1,62 @@
 import { GlobalStyles } from 'Styles/GlobalStyles/GlobalStyles';
 import { MaterialEditorForm } from 'components/MaterialEditorForm';
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { Materials } from 'components/Materials';
 import * as API from 'services/api';
 
-export class App extends Component {
-  state = {
-    materials: [],
-    isLoading: false,
-    error: null,
-  };
-  async componentDidMount() {
-    try {
-      this.setState({ isLoading: true });
-      const materials = await API.getMaterials();
-      this.setState({ materials });
-    } catch (error) {
-      this.setState({ error });
-      console.log(error);
-    } finally {
-      this.setState({ isLoading: false });
-    }
-  }
-  addMaterials = async values => {
+export const App = () => {
+  const [materials, setMaterials] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  console.log(materials);
+
+  const addMaterials = async values => {
     try {
       const material = await API.addMaterials(values);
-      this.setState(({ materials }) => ({
-        materials: [...materials, material],
-      }));
+      setMaterials(prevState => [...prevState, material]);
     } catch (error) {
-      this.setState({ error });
+      setError(error);
       console.log(error);
     }
   };
-  deleteMaterials = async id => {
+
+  const deleteMaterials = async id => {
     try {
       await API.delMaterials(id);
-      this.setState(({ materials }) => ({
-        materials: materials.filter(material => material.id !== id),
-      }));
+      setMaterials(prevState =>
+        prevState.filter(material => material.id !== id)
+      );
     } catch (error) {
-      this.setState({ error });
+      setError(error);
       console.log(error);
     }
   };
-  updateMaterial = async fields => {
+  const updateMaterial = async fields => {
     try {
       const updatedMaterial = await API.updateMaterials(fields);
-      this.setState(({ materials }) => ({
-        materials: materials.map(material =>
+      setMaterials(prevState =>
+        prevState.map(material =>
           material.id === fields.id ? updatedMaterial : material
-        ),
-      }));
+        )
+      );
     } catch (error) {
-      this.setState({ error });
+      setError(error);
       console.log(error);
     }
   };
-  render() {
-    const { isLoading, materials } = this.state;
-    return (
-      <>
-        <MaterialEditorForm onSubmit={this.addMaterials} />
-        {isLoading ? (
-          <div>LOADING</div>
-        ) : (
-          <Materials
-            items={materials}
-            onDelete={this.deleteMaterials}
-            onUpdate={this.updateMaterial}
-          />
-        )}
-        <GlobalStyles />
-      </>
-    );
-  }
-}
+  return (
+    <>
+      <MaterialEditorForm onSubmit={addMaterials} />
+      {isLoading ? (
+        <div>LOADING</div>
+      ) : (
+        <Materials
+          items={materials}
+          onDelete={deleteMaterials}
+          onUpdate={updateMaterial}
+        />
+      )}
+      <GlobalStyles />
+    </>
+  );
+};
