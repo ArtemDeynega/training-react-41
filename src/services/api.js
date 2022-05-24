@@ -23,7 +23,7 @@ const VAR = {
 };
 export const addMaterials = async values => {
   const response = await materialsAdd.post(VAR.materialGet, values);
-  //   console.log(response);
+
   return response.data;
 };
 export const getMaterials = async () => {
